@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  service_id: MyString
+  dlr_enpoint: MyString
+  subscription_endpoint: MyString
+  message_endpoint: MyString
+  short_code: one
+
+two:
+  name: MyString
+  service_id: MyString
+  dlr_enpoint: MyString
+  subscription_endpoint: MyString
+  message_endpoint: MyString
+  short_code: two

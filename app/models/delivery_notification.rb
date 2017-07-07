@@ -1,0 +1,2 @@
+class DeliveryNotification < ApplicationRecord
+end
