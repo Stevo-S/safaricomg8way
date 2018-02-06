@@ -17,29 +17,30 @@ class SdpOperations
 
     # SendSms operation used to send messages to Safaricom SDP server
     # for termination to mobile subscriber 
-    def self.send_sms(message_text, destination, sender, service_id, correlator, linkid = nil)
-	soap_header = self.soap_header(service_id, linkid, destination)
+    def self.send_sms(message_text, destinations, sender, service_id, correlator, linkid = nil)
+	soap_header = self.soap_header(service_id, linkid, destinations.first)
 	soap_namespaces = self.soap_namespaces
-	soap_message = self.soap_message(destination, sender, message_text, correlator)
+	soap_message = self.soap_message(destinations, sender, message_text, correlator)
 	
-	soap_client = Savon.client do  
-            wsdl "wsdl/parlayx_sms_send_service_2_2.wsdl"
-            namespaces soap_namespaces
-            env_namespace :soapenv
-            namespace_identifier :loc
-            pretty_print_xml :true
-            log true
-            logger Rails.logger
-            log_level :debug
-            soap_header soap_header
-        end
+    	destinations.each_slice(10) do
+	    soap_client = Savon.client do  
+		wsdl "wsdl/parlayx_sms_send_service_2_2.wsdl"
+		namespaces soap_namespaces
+		env_namespace :soapenv
+		namespace_identifier :loc
+		pretty_print_xml :true
+		log true
+		logger Rails.logger
+		log_level :debug
+		soap_header soap_header
+	    end
 
-        begin
-            soap_client.call(:send_sms, message: soap_message)
-        rescue Savon::HTTPError => error
-            logger.info error.http.code
-        end
-
+	    begin
+		soap_client.call(:send_sms, message: soap_message)
+	    rescue Savon::HTTPError => error
+		logger.info error.http.code
+	    end
+	end
     end
 
     private
@@ -63,9 +64,9 @@ class SdpOperations
         }
     end
 
-    def self.soap_message(destination, sender, message_text, correlator)
+    def self.soap_message(destinations, sender, message_text, correlator)
 	return {
-            "loc:addresses": "tel:" + destination,
+            "loc:addresses": destinations.collect { |destination| "tel:" + destination },
             "loc:sender_name": sender,
             "loc:message": message_text,
             "loc:receipt_request": {
