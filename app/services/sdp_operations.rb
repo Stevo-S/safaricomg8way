@@ -20,9 +20,9 @@ class SdpOperations
     def self.send_sms(message_text, destinations, sender, service_id, correlator, linkid = nil)
 	soap_header = self.soap_header(service_id, linkid, destinations.first)
 	soap_namespaces = self.soap_namespaces
-	soap_message = self.soap_message(destinations, sender, message_text, correlator)
 	
-    	destinations.each_slice(10) do
+    	destinations.each_slice(Rails.application.secrets.number_recipients_per_request) do |destinations_slice|
+	    soap_message = self.soap_message(destinations_slice, sender, message_text, correlator)
 	    soap_client = Savon.client do  
 		wsdl "wsdl/parlayx_sms_send_service_2_2.wsdl"
 		namespaces soap_namespaces
