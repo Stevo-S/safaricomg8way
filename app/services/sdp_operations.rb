@@ -18,6 +18,7 @@ class SdpOperations
     # SendSms operation used to send messages to Safaricom SDP server
     # for termination to mobile subscriber 
     def self.send_sms(message_text, destinations, sender, service_id, correlator, linkid = nil)
+	destinations.uniq!
 	soap_header = self.soap_header(service_id, linkid, destinations.first)
 	soap_namespaces = self.soap_namespaces
 	

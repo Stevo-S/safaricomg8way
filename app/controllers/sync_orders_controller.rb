@@ -55,7 +55,7 @@ class SyncOrdersController < ApiController
 
     def forward_or_welcome
 	@service = ShortCodeService.find_by_service_id @sync_order.service_id
-	logger.info "service id: " + @sync_order.service_id
+	#logger.info "service id: " + @sync_order.service_id
 	if @service&.subscription_endpoint.present? then
 	   notification = {
 		phone_number: @sync_order.user_id,
@@ -63,7 +63,7 @@ class SyncOrdersController < ApiController
 		notification_type: @sync_order.update_description.downcase == 'addition' ? 'activation' : 'deactivation'
 	   } 
 	    
-	    ForwardNotificationJob.set(wait: 1.seconds).perform_later(@service.subscription_endpoint, notification)
+	    ForwardNotificationJob.perform_later(@service.subscription_endpoint, notification)
 	else
 	    #TODO: Respond to subscriber with a default, generic welcome message 
 	end
