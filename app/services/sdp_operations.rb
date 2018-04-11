@@ -57,11 +57,15 @@ class SdpOperations
                 "v2:sp_id": @@sdp_sp_id,
                 "v2:sp_password": @@hashed_sdp_password,
                 "v2:service_id": service_id,
-                "v2:time_stamp": @@timestamp_string,
-                "v2:linkid": linkid,
-                "v2:OA": destination,
-                "v2:FA": destination
-           }
+                "v2:time_stamp": @@timestamp_string #,
+                # "v2:linkid": linkid,
+                # "v2:OA": destination,
+                # "v2:FA": destination
+           }.merge( destinations.count > 1 ? {
+                 "v2:linkid": linkid,
+                 "v2:OA": destination,
+                 "v2:FA": destination
+             })
         }
     end
 
