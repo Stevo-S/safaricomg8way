@@ -65,7 +65,7 @@ class SdpOperations
                  "v2:linkid": linkid,
                  "v2:OA": destination,
                  "v2:FA": destination
-             })
+             } : {})
         }
     end
 
