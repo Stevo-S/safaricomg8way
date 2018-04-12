@@ -61,7 +61,7 @@ class SdpOperations
                 # "v2:linkid": linkid,
                 # "v2:OA": destination,
                 # "v2:FA": destination
-           }.merge( destinations.count > 1 ? {
+           }.merge( destinations.count < 1 ? {
                  "v2:linkid": linkid,
                  "v2:OA": destination,
                  "v2:FA": destination
