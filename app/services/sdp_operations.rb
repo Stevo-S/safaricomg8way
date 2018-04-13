@@ -37,7 +37,8 @@ class SdpOperations
 	    end
 
 	    begin
-		soap_client.call(:send_sms, message: soap_message)
+		response = soap_client.call(:send_sms, message: soap_message)
+		logger.info "Response:\n\t" + response.to_s
 	    rescue Savon::HTTPError => error
 		logger.info error.http.code
 	    end

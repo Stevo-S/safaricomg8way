@@ -82,7 +82,7 @@
 
    <wsdl:service name="SendSmsService">
       <wsdl:port name="SendSms" binding="tns:SendSmsBinding">
-         <soap:address location="http://41.90.0.130:8310/SendSmsService/services/SendSms"/>
+         <soap:address location="https://7ae8bbe0-eee1-45bc-b851-907a4d525cdd.mock.pstmn.io"/>
       </wsdl:port>
    </wsdl:service>
 </wsdl:definitions>
