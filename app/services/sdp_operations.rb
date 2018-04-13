@@ -38,9 +38,11 @@ class SdpOperations
 
 	    begin
 		retries ||= 0
+		initial_delay_in_s = 1000
 		response = soap_client.call(:send_sms, message: soap_message)
 	    rescue Savon::HTTPError => error
 		logger.info error.http.code
+		sleep(retries * initial_delay_in_s)
 		retry if (retries += 1) < 3
 	    end
 	end
