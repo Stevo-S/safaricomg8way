@@ -44,7 +44,6 @@ class SdpOperations
 		logger.info error.http.code
 		# Wait a little bit before retrying
 		sleep(retries * initial_delay_in_s)
-		retry if (retries += 1) < 3
 		if (retries += 1) < 10 
 		    retry
 		else
