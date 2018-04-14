@@ -19,7 +19,7 @@ class SdpOperations
     # for termination to mobile subscriber 
     def self.send_sms(message_text, destinations, sender, service_id, correlator, linkid = nil)
 	destinations.uniq!
-	soap_header = self.soap_header(service_id, linkid, destinations.first)
+	soap_header = self.soap_header(service_id, linkid)
 	soap_namespaces = self.soap_namespaces
 	
     	destinations.each_slice(Rails.application.secrets.number_recipients_per_request) do |destinations_slice|
@@ -41,7 +41,6 @@ class SdpOperations
 		initial_delay_in_s = 1
 		response = soap_client.call(:send_sms, message: soap_message)
 	    rescue Savon::HTTPError, Savon::SOAPFault => error
-		logger.info error.http.code
 		# Wait a little bit before retrying
 		sleep(retries * initial_delay_in_s)
 		if (retries += 1) < 10 
@@ -60,7 +59,7 @@ class SdpOperations
         }
     end
 
-    def self.soap_header(service_id, linkid, destination)
+    def self.soap_header(service_id, linkid)
 	 return  { 
            "v2:RequestSOAPHeader": {
                 "v2:sp_id": @@sdp_sp_id,
@@ -70,7 +69,7 @@ class SdpOperations
                 # "v2:linkid": linkid,
                 # "v2:OA": destination,
                 # "v2:FA": destination
-           }.merge( destinations.count < 1 ? {
+           }.merge( linkid.present? ? {
                  "v2:linkid": linkid,
                  "v2:OA": destination,
                  "v2:FA": destination
