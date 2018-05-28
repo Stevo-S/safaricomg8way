@@ -1,0 +1,3 @@
+:queues:
+    - send_sms
+    - forward_notification
