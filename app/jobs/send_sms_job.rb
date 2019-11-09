@@ -1,5 +1,5 @@
 class SendSmsJob < ApplicationJob
-  queue_as :default
+  queue_as :send_sms
 
   def perform(message_ids)
 

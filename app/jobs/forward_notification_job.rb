@@ -1,5 +1,5 @@
 class ForwardNotificationJob < ApplicationJob
-  queue_as :default
+  queue_as :forward_notifications
 
   def perform(endpoint, notification)
     uri = URI(endpoint)
