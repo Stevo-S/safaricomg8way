@@ -15,4 +15,5 @@ Rails.application.routes.draw do
     resources :delivery_notifications
     resources :sync_orders
     resources :sms_notifications
+    resources :subscriptions
 end
