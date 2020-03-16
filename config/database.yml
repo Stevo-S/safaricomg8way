@@ -17,9 +17,9 @@ development:
     adapter:  postgresql
     encoding: unicode
     host:     localhost
-    database: safari_gate_dev
-    username: safari_gate_dev
-    password: safari_gate_dev
+    database: safaricomg8way_dev
+    username: safaricomg8way_dev
+    password: safaricomg8way_dev
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -33,8 +33,8 @@ test:
     encoding: unicode
     database: safari_gate_test
     pool: 5
-    username: safari_gate_test
-    password: safari_gate_test
+    username: safaricomg8way_test
+    password: safaricomg8way_test
 
 
 
@@ -46,9 +46,9 @@ test:
 production:
     adapter:  postgresql
     encoding: unicode
-    database: safari_gate
+    database: safaricomg8way
     pool: 5
-    username: safari_gate
+    username: safaricomg8way
 
 
 
