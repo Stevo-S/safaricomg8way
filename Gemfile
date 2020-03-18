@@ -56,8 +56,6 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 # Use passenger as web server
 gem "passenger", "~> 5.0", require: "phusion_passenger/rack_handler"
 
-# Use Savon to handle SOAP requests
-gem 'savon', '~> 2.0'
 
 # Use Sidekiq for queiuing and running jobs
 gem 'sidekiq'
@@ -74,3 +72,7 @@ gem 'pg'
 
 # Enable webpacker
 gem 'webpacker'
+
+
+# Use coffee script
+gem 'coffee-rails'
