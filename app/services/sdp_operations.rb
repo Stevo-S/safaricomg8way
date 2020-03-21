@@ -36,7 +36,27 @@ class SdpOperations
 				CpId:		@@cp_id
 			    ]
 		    }
-	    }
+	    }.to_json
+
+	    http = Net::HTTP.new(url.host, url.port)
+	    http.use_ssl = true if uri.scheme == "https"
+
+	    begin
+		retries ||= 0
+		initial_delay_in_s = 1
+		send_sms_response = http.request send_sms_request
+	    rescue StandardError => error
+		# Wait a little bit before retrying
+		# sleep(retries * initial_delay_in_s)
+		if (retries += 1) < 10 
+		    retry
+		else
+		    raise error
+		end
+	    end		
+
+
+	    
 	end
     end
 
@@ -50,9 +70,26 @@ class SdpOperations
 	    generate_token_request.body = {
 		    username: @@sdp_username,
 		    password: @@sdp_password
-		}to_json
+		}.to_json
 
-	    JSON.parse(response.body)["access_token"]
+	    http = Net::HTTP.new(url.host, url.port)
+	    http.use_ssl = true if uri.scheme == "https"
+
+	    begin
+		retries ||= 0
+		initial_delay_in_s = 1
+		generate_token_response = http.request generate_token_request
+	    rescue StandardError => error
+		# Wait a little bit before retrying
+		# sleep(retries * initial_delay_in_s)
+		if (retries += 1) < 10 
+		    retry
+		else
+		    raise error
+		end
+	    end		
+
+	    JSON.parse(generate_token_response.body)["access_token"]
 	end
     end
 
