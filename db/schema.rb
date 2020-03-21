@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_16_080624) do
+ActiveRecord::Schema.define(version: 2020_03_21_070848) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -54,6 +54,22 @@ ActiveRecord::Schema.define(version: 2020_03_16_080624) do
     t.string "trace_unique_id", limit: 50
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "offer_routes", force: :cascade do |t|
+    t.string "offer_code"
+    t.string "name"
+    t.string "description"
+    t.string "short_code"
+    t.string "activation_keywords"
+    t.string "deactivation_keywords"
+    t.string "mo_endpoint"
+    t.string "subscription_endpoint"
+    t.string "unsubscription_endpoint"
+    t.string "dlr_endpoint"
+    t.boolean "active"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "short_code_services", force: :cascade do |t|
