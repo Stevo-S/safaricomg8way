@@ -1,7 +1,7 @@
-class SendSmsJob < ApplicationJob
+class SendSmsIndividualJob < ApplicationJob
   queue_as :send_sms
 
-  def perform(message_ids)
+  def perform(message_id)
 
     # uri = URI('http://localhost:3000/sms_messages')
     # send_request = Net::HTTP::Post.new uri
@@ -15,8 +15,8 @@ class SendSmsJob < ApplicationJob
    # SdpOperations.send_sms(outbound_message['text_message'], outbound_message['destination'], outbound_message['sender'],
 #	outbound_message['service_id'], Time.now.strftime("%Y%m%d%H%M%S"), outbound_message['link_id'])
 #
-    sms_message = SmsMessage.find(message_ids.first)
-    destinations = SmsMessage.find(message_ids).pluck(:destination)
+    sms_message = SmsMessage.find(message_id)
+    destinations = [sms_message.destination]
     if sms_message then
 	    # service_id = ShortCode.find_by_code(sms_message.sender)&.short_code_service.service_id
 	    offer_code = OfferRoute.find_by_short_code(sms_message.sender)&.offer_code

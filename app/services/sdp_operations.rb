@@ -2,7 +2,7 @@ class SdpOperations
 
     # Intiialize details required to communicate with Safaricom SDP server
     @@sdp_server_address = Rails.application.credentials.sdp[:server_address]
-    @@sdp_server_port = Rails.application.credentials.sdp[:server_port]
+    @@sdp_server_port = Rails.application.credentials.sdp[:server_port].to_s
     @@cp_id = Rails.application.credentials.sdp[:cp_id].to_s
     @@sdp_username = Rails.application.credentials.sdp[:username]
     @@sdp_password = Rails.application.credentials.sdp[:password]
@@ -13,33 +13,59 @@ class SdpOperations
     # for termination to mobile subscriber 
     def self.send_sms(message_text, destinations, sender, offer_code, correlator, linkid = nil)
 	destinations.uniq!
-	
+
+	Rails.logger = Logger.new(STDOUT)
+	Rails.logger.level = Logger::DEBUG    
+	logger = Rails.logger
+
+	byebug
+
 	url = URI(@@sdp_server_address + ':' + @@sdp_server_port + '/api/public/SDP/sendSMSRequest')
     	destinations.each_slice(Rails.application.credentials.recipients_per_request) do |destinations_slice|
-	    #TODO: Add Send SMS logic
+	    
+	    # logger.info 'Access Token: ' + access_token
+
+	    byebug
+
 	    send_sms_request = Net::HTTP::Post.new(url)
 	    send_sms_request.content_type = 'application/json'
-	    send_sms_request["X-Authorization"] = "Bearer " + access_token
+	    send_sms_request["X-Authorization"] = "Bearer " + self.access_token
 	    
+	    msisdns = []
+	    destinations.each do |destination|
+		msisdns << { name: "Msisdn", value: destination }
+	    end
+
 	    send_sms_request.body = {
-		requestId: Time.now.to_string,
+		requestId: Time.now.strftime("%Y%m%d%H%M%S"),
 		channel: "APIGW",
 		operation: "SendSMS",
 		requestParam: 
 		    {
 			data:
 			    [
-				LinkId:		linkid,
-				Msisdn: 	destinations,
-				OfferCode:	offer_code,
-				Content:	message_text,
-				CpId:		@@cp_id
-			    ]
+				{
+				    name:   	"LinkId",
+				    value:	""#linkid.present? linkid : ""
+				},
+				{
+				    name:	"OfferCode",
+				    value:	offer_code
+				},
+				{
+				    name:	"Content",
+				    value:	message_text
+				},
+				{
+				    name:	"CpId",
+				    value:	@@cp_id
+				}
+			    ] + msisdns 		    
 		    }
 	    }.to_json
 
 	    http = Net::HTTP.new(url.host, url.port)
-	    http.use_ssl = true if uri.scheme == "https"
+	    http.use_ssl = true if url.scheme == "https"
 
 	    begin
 		retries ||= 0
@@ -54,15 +80,16 @@ class SdpOperations
 		    raise error
 		end
 	    end		
-
+		
+	    send_sms_response
 
 	    
 	end
     end
 
 
-    def access_token
-	Rails.cache.fetch("#{cache_key_with_version}/sdp_api_token", expires_in: 1.hour) do
+    def self.access_token
+	Rails.cache.fetch("sdp_api_token", expires_in: 1.hour, skip_nil: true) do
 	    url = URI(@@sdp_server_address + ':' + @@sdp_server_port + '/api/auth/login')
 	    generate_token_request = Net::HTTP::Post.new(url)
 	    generate_token_request.content_type = 'application/json'
@@ -73,7 +100,7 @@ class SdpOperations
 		}.to_json
 
 	    http = Net::HTTP.new(url.host, url.port)
-	    http.use_ssl = true if uri.scheme == "https"
+	    http.use_ssl = true if url.scheme == "https"
 
 	    begin
 		retries ||= 0
@@ -89,7 +116,7 @@ class SdpOperations
 		end
 	    end		
 
-	    JSON.parse(generate_token_response.body)["access_token"]
+	    JSON.parse(generate_token_response.body)["token"]
 	end
     end
 
