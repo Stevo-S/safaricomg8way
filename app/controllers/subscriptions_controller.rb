@@ -1,7 +1,6 @@
 class SubscriptionsController < ApiController
     def create
-    	@subscription = subscription_details(params)
-	@subscription.save
+    	@subscription = Subscription.create(subscription_params)
 
 	route_subscription 
 
@@ -10,16 +9,31 @@ class SubscriptionsController < ApiController
 
     private
 
-    def subscription_details(params)
-	subscription = Subscription.new
+    def subscription_params
+	subscription_details = {}
 
-	subscription.request_id = params[:requestId]
-	subscription.request_time_stamp = params[:requestTimeStamp]
+	subscription_details[:request_id] = params[:requestId]
+	subscription_details[:request_time_stamp] = params[:requestTimeStamp]
 	params[:requestParam][:data].each do |datum|
-	   subscription[datum[:name].underscore] = datum[:value]
+	    if not datum[:name].downcase == 'type' then 
+	        subscription_details[datum[:name].underscore] = datum[:value]
+	    else
+		subscription_details[:subscription_type] = datum[:value]
+	    end
         end	
+
+	if (params[:requestParam][:additionalData]) then
+	    params[:requestParam][:additionalData].each do |datum|
+		subscription_details[datum[:name].underscore] = datum[:value]
+	    end
+	end
 	
-	subscription
+	new_params = ActionController::Parameters.new({ subscription: subscription_details })
+
+    	new_params.require(:subscription).permit(:request_id, :request_time_stamp,
+		:transaction_id, :client_transaction_id, :language, :subscriber_life_cycle,
+		:subscription_status, :next_billing_date, :subscription_type, :short_code, :channel,
+		:operation, :offer_code, :msisdn, :consent_value, :user_data)	
     end
 
     def route_subscription 
@@ -30,11 +44,15 @@ class SubscriptionsController < ApiController
 	    notification = {
 	      phone_number: @subscription.msisdn,
 	      short_code: @subscription.short_code,
-	      notification_type: @subscription.type.downcase.start_with?( "activ") ? 'activation' : 'deactivation'
+	      notification_type: @subscription.subscription_type.downcase
 	    }
 
-	    if notification[:notification_type] == 'activation'
+	    if notification[:notification_type] == 'activation' then
 		ForwardNotificationJob.perform_later(offer_route.subscription_endpoint, notification) if offer_route.subscription_endpoint.present?
+	    elsif notification[:notification_type] == 'consent' then
+		# Do nothing for now
+		# Decide later on if we should forward this as well or not
+		puts("Consent notification")
 	    else
 		ForwardNotificationJob.perform_later(offer_route.unsubscription_endpoint, notification) if offer_route.unsubscription_endpoint.present?
 	    end
