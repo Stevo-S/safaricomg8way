@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_21_123702) do
+ActiveRecord::Schema.define(version: 2020_04_12_193536) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -122,7 +122,7 @@ ActiveRecord::Schema.define(version: 2020_03_21_123702) do
     t.string "subscriber_life_cycle"
     t.string "subscription_status", limit: 1
     t.string "next_billing_date"
-    t.string "type"
+    t.string "subscription_type"
     t.string "short_code", limit: 5
     t.string "channel"
     t.string "operation"
@@ -132,6 +132,8 @@ ActiveRecord::Schema.define(version: 2020_03_21_123702) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "offer_name"
     t.string "reason"
+    t.string "user_data"
+    t.string "consent_value"
   end
 
   create_table "sync_orders", force: :cascade do |t|
