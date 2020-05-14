@@ -21,11 +21,11 @@ class SendSmsJob < ApplicationJob
 	    # service_id = ShortCode.find_by_code(sms_message.sender)&.short_code_service.service_id
 	    offer_code = OfferRoute.find_by_short_code(sms_message.sender)&.offer_code
 	    begin 
-		retries ||= 0
+		#retries ||= 0
 	    	SdpOperations.send_sms(sms_message.content, destinations, sms_message.sender,
 		offer_code, Time.now.strftime("%Y%m%d%H%M%S"), sms_message.link_id)
 	    rescue StandardError => error
-		retry if (retries += 1) < 3
+		#retry if (retries += 1) < 3
 		puts error
             end
     end

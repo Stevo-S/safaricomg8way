@@ -25,10 +25,11 @@ class SmsMessagesController < ApiController
 		 |destination| { content: sms, sender: sender, destination: destination, link_id: link_id}
 	 end )
 
-	# SendSmsJob.perform_later(sms_messages.pluck(:id))
-	sms_messages.each do |sms|
-	    SendSmsIndividualJob.perform_later(sms.id)
-	end
+	SendSmsJob.perform_later(sms_messages.pluck(:id))
+
+	#sms_messages.each do |sms|
+	#    SendSmsIndividualJob.perform_later(sms.id)
+	#end
 
 	render json: { status: 'queued for sending' }
     end

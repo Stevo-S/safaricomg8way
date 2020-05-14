@@ -47,7 +47,7 @@ production:
     adapter:  postgresql
     encoding: unicode
     database: safaricomg8way
-    pool: 5
+    pool: 50
     username: safaricomg8way
 
 
