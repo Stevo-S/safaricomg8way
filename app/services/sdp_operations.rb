@@ -18,14 +18,11 @@ class SdpOperations
 	Rails.logger.level = Logger::DEBUG    
 	logger = Rails.logger
 
-	byebug
-
 	url = URI(@@sdp_server_address + ':' + @@sdp_server_port + '/api/public/SDP/sendSMSRequest')
     	destinations.each_slice(Rails.application.credentials.recipients_per_request) do |destinations_slice|
 	    
 	    # logger.info 'Access Token: ' + access_token
 
-	    byebug
 
 	    send_sms_request = Net::HTTP::Post.new(url)
 	    send_sms_request.content_type = 'application/json'
