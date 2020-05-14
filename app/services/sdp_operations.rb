@@ -28,39 +28,41 @@ class SdpOperations
 #	    send_sms_request.content_type = 'application/json'
 #	    send_sms_request["X-Authorization"] = "Bearer " + self.access_token
 	    
-
-	    send_sms_request_body = {
-		requestId: Time.now.strftime("%Y%m%d%H%M%S"),
-		channel: "APIGW",
-		operation: "SendSMS",
-		requestParam: 
-		    {
-			data:
-			    [
-				{
-				    name:   	"LinkId",
-				    value:	""#linkid.present? linkid : ""
-				},
-				{
-				    name:	"OfferCode",
-				    value:	offer_code
-				},
-				{
-				    name:	"Content",
-				    value:	message_text
-				},
-				{
-				    name:	"CpId",
-				    value:	@@cp_id
-				}
-			    ]  		    
-		    }
-	    }
-
 	    hydra = Typhoeus::Hydra.hydra
 
 	    destinations.each do |destination|
-		send_sms_request_body[:requestParam][:data] << { name: "Msisdn", value: destination }
+	
+		send_sms_request_body = {
+		    requestId: Time.now.strftime("%Y%m%d%H%M%S"),
+		    channel: "APIGW",
+		    operation: "SendSMS",
+		    requestParam: 
+			{
+			    data:
+				[
+				    {
+					name:   	"LinkId",
+					value:	""#linkid.present? linkid : ""
+				    },
+				    {
+					name:	"OfferCode",
+					value:	offer_code
+				    },
+				    {
+					name:	"Content",
+					value:	message_text
+				    },
+				    {
+					name:	"CpId",
+					value:	@@cp_id
+				    },
+				    {
+					name: "Msisdn",
+					value: destination
+				    }
+				]  		    
+			}
+		}
 
 		request = Typhoeus::Request.new(
 		    url,
