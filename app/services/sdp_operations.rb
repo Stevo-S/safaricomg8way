@@ -24,16 +24,12 @@ class SdpOperations
 	    # logger.info 'Access Token: ' + access_token
 
 
-	    send_sms_request = Net::HTTP::Post.new(url)
-	    send_sms_request.content_type = 'application/json'
-	    send_sms_request["X-Authorization"] = "Bearer " + self.access_token
+#	    send_sms_request = Net::HTTP::Post.new(url)
+#	    send_sms_request.content_type = 'application/json'
+#	    send_sms_request["X-Authorization"] = "Bearer " + self.access_token
 	    
-	    msisdns = []
-	    destinations.each do |destination|
-		msisdns << { name: "Msisdn", value: destination }
-	    end
 
-	    send_sms_request.body = {
+	    send_sms_request_body = {
 		requestId: Time.now.strftime("%Y%m%d%H%M%S"),
 		channel: "APIGW",
 		operation: "SendSMS",
@@ -57,28 +53,52 @@ class SdpOperations
 				    name:	"CpId",
 				    value:	@@cp_id
 				}
-			    ] + msisdns 		    
+			    ]  		    
 		    }
-	    }.to_json
+	    }
 
-	    http = Net::HTTP.new(url.host, url.port)
-	    http.use_ssl = true if url.scheme == "https"
+	    hydra = Typhoeus::Hydra.hydra
 
-	    begin
-		retries ||= 0
-		initial_delay_in_s = 1
-		send_sms_response = http.request send_sms_request
-	    rescue StandardError => error
+	    destinations.each do |destination|
+		send_sms_request_body[:requestParam][:data] << { name: "Msisdn", value: destination }
+
+		request = Typhoeus::Request.new(
+		    url,
+		    method: :post,
+		    body: send_sms_request_body.to_json,
+		    headers: {
+			"Content-Type": 'application/json',
+			"X-Authorization": 'Bearer ' + self.access_token
+		    }			
+		)
+
+		request.on_complete do |response|
+		    puts response.body
+		end
+
+		hydra.queue request
+	    end
+
+	    hydra.run
+
+#	    http = Net::HTTP.new(url.host, url.port)
+#	    http.use_ssl = true if url.scheme == "https"
+
+#	    begin
+#		retries ||= 0
+#		initial_delay_in_s = 1
+#		send_sms_response = http.request send_sms_request
+#	    rescue StandardError => error
 		# Wait a little bit before retrying
 		# sleep(retries * initial_delay_in_s)
-		if (retries += 1) < 10 
-		    retry
-		else
-		    raise error
-		end
-	    end		
+#		if (retries += 1) < 10 
+#		    retry
+#		else
+#		    raise error
+#		end
+#	    end		
 		
-	    send_sms_response
+#	    send_sms_response
 
 	    
 	end

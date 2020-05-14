@@ -76,3 +76,7 @@ gem 'webpacker'
 
 # Use coffee script
 gem 'coffee-rails'
+
+
+# Use Typhoeus for parallel HTTP requests
+gem 'typhoeus'
